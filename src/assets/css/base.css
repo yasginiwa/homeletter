@@ -1,0 +1,52 @@
+@import './normalize.css';
+
+:root {
+    --color-text: #fff;
+    --color-high-text: #eee;
+    --color-background: #002051;
+    --font-size: 14px;
+    --line-height: 1.5
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    user-select: none;  /* 禁止用户鼠标在页面上选中文字/图片等 */
+    -webkit-tap-highlight-color: transparent; /* webkit是苹果浏览器核心 tap点击 highlight 背景高亮 color颜色 颜色用数字调节 */
+    /*background: var(--color-background);  背景色 */
+    width: 100vw; /* 宽度为百分百视口宽度 */
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.clear-fix::after {
+    clear: both;
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+.clear-fix {
+    zoom: 1;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
