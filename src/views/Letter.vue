@@ -2,7 +2,7 @@
   <div class="letter">
     <div class="logo">
       <img src="../assets/images/crown_logo.png" alt />
-      <img src="../assets/images/post_logo.png" alt="">
+      <img src="../assets/images/post_logo.png" alt />
     </div>
     <div class="paper-wrapper">
       <div class="paper" :class="isSubmit === true ? 'paperMove' : ''">
@@ -17,20 +17,25 @@
             <div class="info">
               <div class="name">
                 <span>姓名：</span>
-                <input :disabled=!isEdit v-model="expressInfo.reciever.name" />
+                <input :disabled="!isEdit" v-model="expressInfo.reciever.name" />
               </div>
 
               <div class="phone">
                 <span>电话：</span>
-                <input :disabled=!isEdit v-model.number="expressInfo.reciever.phone" />
+                <input :disabled="!isEdit" v-model="expressInfo.reciever.phone" />
               </div>
             </div>
 
             <div class="address">
               <span>所在地区：</span>
-              <v-distpicker :disabled=!isEdit @selected="onRecieverSelected" :province="expressInfo.reciever.province" :city="expressInfo.reciever.city" :area="expressInfo.reciever.area"></v-distpicker>
+              <v-distpicker
+                :disabled="!isEdit"
+                @selected="onRecieverSelected"
+                :province="expressInfo.reciever.province"
+                :city="expressInfo.reciever.city"
+                :area="expressInfo.reciever.area"
+              ></v-distpicker>
             </div>
-
           </div>
         </div>
         <div class="paper-2">
@@ -38,7 +43,7 @@
           <div class="poster">
             <div class="detail">
               <span>详细地址：</span>
-              <input :disabled=!isEdit v-model="expressInfo.reciever.detail" />
+              <input :disabled="!isEdit" v-model="expressInfo.reciever.detail" />
             </div>
 
             <div class="title">
@@ -49,23 +54,29 @@
             <div class="info">
               <div class="name">
                 <span>姓名：</span>
-                <input :disabled=!isEdit v-model="expressInfo.sender.name" />
+                <input :disabled="!isEdit" v-model="expressInfo.sender.name" />
               </div>
 
               <div class="phone">
                 <span>电话：</span>
-                <input :disabled=!isEdit v-model.number="expressInfo.sender.phone" />
+                <input :disabled="!isEdit" v-model="expressInfo.sender.phone" />
               </div>
             </div>
 
             <div class="address">
               <span>所在地区：</span>
-              <v-distpicker @selected="onSenderSelected" :disabled=!isEdit :province="expressInfo.sender.province" :city="expressInfo.sender.city" :area="expressInfo.sender.area"></v-distpicker>
+              <v-distpicker
+                @selected="onSenderSelected"
+                :disabled="!isEdit"
+                :province="expressInfo.sender.province"
+                :city="expressInfo.sender.city"
+                :area="expressInfo.sender.area"
+              ></v-distpicker>
             </div>
 
             <div class="detail">
               <span>详细地址：</span>
-              <input :disabled=!isEdit v-model="expressInfo.sender.detail" />
+              <input :disabled="!isEdit" v-model="expressInfo.sender.detail" />
             </div>
           </div>
           <div
@@ -73,6 +84,7 @@
             @touchstart="touchbegin"
             @touchend="touchend"
             :class="isTouched === true? 'active': 'submit'"
+            v-if="isEdit === true ? true : false"
           >提交</div>
         </div>
       </div>
@@ -95,7 +107,7 @@
           src="../assets/images/envelope_front.png"
           :class="isSubmit === true ? 'envelopeMoveFront' : ''"
         />
-        <div class="openBtn" @click="expand" :class="isSubmit === true ? 'envelopeOpen' : ''">展开</div>
+        <div class="openBtn" @click="expand" :class="isSubmit === true ? 'envelopeOpen' : ''">{{ envelopeDesc }}</div>
       </div>
     </div>
     <div class="copyright">
@@ -106,6 +118,7 @@
 
 <script>
 import VDistpicker from "v-distpicker";
+import { request } from "@/network/request";
 
 export default {
   components: {
@@ -116,6 +129,8 @@ export default {
       isTouched: false,
       isSubmit: false,
       isEdit: true,
+      isExpand: true,
+      envelopeDesc: "",
       expressInfo: {
         reciever: {
           name: "",
@@ -138,8 +153,65 @@ export default {
   },
   methods: {
     submit(e) {
-      console.log(e);
-      this.isSubmit = true;
+      this.$confirm({
+        title: "提示",
+        content: "所有邮寄信息是否无误？"
+      })
+        .then(res => {
+          /**
+           * 判断邮寄信息是否填写完整
+           * 完整 提交 网络请求
+           * 不完整 弹框提示
+           */
+          let { reciever, sender } = this.expressInfo;
+          if (
+            this.objHasAllValues(Object.values(reciever)) &&
+            this.objHasAllValues(Object.values(sender))
+          ) {
+            this.$loading.show("提交中...");
+            request({
+              url: "/home/multidata"
+            })
+              .then(res => { // 请求成功
+                if (!res) {
+                  console.log("失败");
+                  this.$loading.hide();
+                  this.$toast("手机网络不给力...");
+                } else {
+                  console.log(res)
+                  this.$loading.hide();
+                  this.$toast("提交成功，谢谢惠顾！");
+                  this.isSubmit = true;
+                  this.isEdit = false;
+                  this.envelopeDesc = "展开"
+                }
+              })
+              .catch(err => {
+                console.log("失败");
+                this.$loading.hide();
+                this.$toast("手机网络不给力...");
+              });
+          } else {
+            this.$toast("请填写完整邮寄信息！");
+          }
+        })
+        .catch(err => { //请求失败
+          // console.log(err);
+        });
+    },
+
+    /**
+     * 判断对象所有属性是否有值
+     * 判断用户是否完整填写所有快递信息
+     */
+    objHasAllValues(obj) {
+      obj = obj || {};
+      for (const v of obj) {
+        if (v.trim().length == "") {
+          return false;
+        }
+      }
+      return true;
     },
     touchbegin() {
       this.isTouched = true;
@@ -148,20 +220,26 @@ export default {
       this.isTouched = false;
     },
     expand() {
-      this.isSubmit = false;
+      this.isSubmit = !this.isSubmit
+      if(this.isSubmit) {
+        this.isExpand = false
+        this.envelopeDesc = "展开"
+      } else {
+        this.isExpand = true
+        this.envelopeDesc = "折叠"
+      }
     },
     onRecieverSelected(data) {
-      console.log(data)
-      let { province, city, area } = data
-      this.expressInfo.reciever.province = province.value
-      this.expressInfo.reciever.city = city.value
-      this.expressInfo.reciever.area = area.value
+      let { province, city, area } = data;
+      this.expressInfo.reciever.province = province.value;
+      this.expressInfo.reciever.city = city.value;
+      this.expressInfo.reciever.area = area.value;
     },
     onSenderSelected(data) {
-      let { province, city, area } = data
-      this.expressInfo.sender.province = province.value
-      this.expressInfo.sender.city = city.value
-      this.expressInfo.sender.area = area.value
+      let { province, city, area } = data;
+      this.expressInfo.sender.province = province.value;
+      this.expressInfo.sender.city = city.value;
+      this.expressInfo.sender.area = area.value;
     }
   }
 };
@@ -302,7 +380,7 @@ export default {
   margin-right: 5px;
 }
 
-.sender>.address {
+.sender > .address {
   margin-bottom: -10px;
 }
 
@@ -479,7 +557,7 @@ export default {
   font-weight: bold;
   text-align: center;
   line-height: 50px;
-  opacity: 0;
+  text-shadow: 0 0 10px #000;
 }
 
 .open {
@@ -488,7 +566,6 @@ export default {
 
 @keyframes open {
   100% {
-    opacity: 1;
     transform: translateZ(200px);
   }
 }
@@ -501,11 +578,9 @@ export default {
 @keyframes envelopeOpen {
   0% {
     transform: translateY(-120px);
-    opacity: 0;
   }
   100% {
     transform: translateZ(220px) translateY(-120px);
-    opacity: 1;
   }
 }
 
