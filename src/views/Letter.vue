@@ -107,7 +107,11 @@
           src="../assets/images/envelope_front.png"
           :class="isSubmit === true ? 'envelopeMoveFront' : ''"
         />
-        <div class="openBtn" @click="expand" :class="isSubmit === true ? 'envelopeOpen' : ''">{{ envelopeDesc }}</div>
+        <div
+          class="openBtn"
+          @click="expand"
+          :class="isSubmit === true ? 'envelopeOpen' : ''"
+        >{{ envelopeDesc }}</div>
       </div>
     </div>
     <div class="copyright">
@@ -151,6 +155,15 @@ export default {
       }
     };
   },
+
+  mounted() {
+    var height = document.documentElement.clientHeight; //获取当前可视区域的高度存到hrt变量
+    window.onload = function() {
+      //在页面整体加载完毕时
+      document.querySelector(".letter").style.height = height + "px"; //把获取到的高度赋值给根div
+    };
+  },
+
   methods: {
     submit(e) {
       this.$confirm({
@@ -172,18 +185,19 @@ export default {
             request({
               url: "/home/multidata"
             })
-              .then(res => { // 请求成功
+              .then(res => {
+                // 请求成功
                 if (!res) {
                   console.log("失败");
                   this.$loading.hide();
                   this.$toast("手机网络不给力...");
                 } else {
-                  console.log(res)
+                  console.log(res);
                   this.$loading.hide();
                   this.$toast("提交成功，谢谢惠顾！");
                   this.isSubmit = true;
                   this.isEdit = false;
-                  this.envelopeDesc = "展开"
+                  this.envelopeDesc = "展开";
                 }
               })
               .catch(err => {
@@ -195,7 +209,8 @@ export default {
             this.$toast("请填写完整邮寄信息！");
           }
         })
-        .catch(err => { //请求失败
+        .catch(err => {
+          //请求失败
           // console.log(err);
         });
     },
@@ -220,13 +235,13 @@ export default {
       this.isTouched = false;
     },
     expand() {
-      this.isSubmit = !this.isSubmit
-      if(this.isSubmit) {
-        this.isExpand = false
-        this.envelopeDesc = "展开"
+      this.isSubmit = !this.isSubmit;
+      if (this.isSubmit) {
+        this.isExpand = false;
+        this.envelopeDesc = "展开";
       } else {
-        this.isExpand = true
-        this.envelopeDesc = "折叠"
+        this.isExpand = true;
+        this.envelopeDesc = "折叠";
       }
     },
     onRecieverSelected(data) {
