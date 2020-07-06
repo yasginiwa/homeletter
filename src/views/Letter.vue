@@ -275,7 +275,7 @@ export default {
 }
 
 .logo img {
-  margin: 30px;
+  margin: 30px 44px;
   position: absolute;
 }
 
@@ -314,6 +314,16 @@ export default {
   height: 483px;
   transform-origin: center bottom;
   position: relative;
+}
+
+.paper-1 .backside {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  transform: rotateY(180deg);
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .paper-1 img {

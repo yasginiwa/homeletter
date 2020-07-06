@@ -23,6 +23,7 @@ body {
     width: 100vw; /* 宽度为百分百视口宽度 */
     padding: 0;
     margin: 0;
+    -webkit-touch-callout: none;
 }
 
 a {
