@@ -6,7 +6,7 @@ const config = {
         token: 'HGCakeECSell',
         appKey: 'SEdDYWtlT3JkZXJBbmRTZWxsMjAxOA==',
         signKey: 'BPe2XMzYP6UydzAuWiPuthAWVrMWkbmC',
-        baseUrl: 'http://www.crowncake.cn:26666/icapi'
+        baseUrl: 'http://www.crowncake.cn:27777/icapi'
         // tmticketUrl: 'http://58.49.120.90:26666/icapi/tmticket',
         // tmticketqueryUrl: 'http://58.49.120.90:26666/icapi/tmticketquery'
 }

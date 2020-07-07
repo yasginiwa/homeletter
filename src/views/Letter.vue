@@ -5,36 +5,39 @@
       <img src="../assets/images/post_logo.png" alt />
     </div>
     <div class="paper-wrapper">
-      <div class="paper" :class="isSubmit === true ? 'paperMove' : ''">
-        <div class="paper-1" :class="isSubmit === true ? 'paper1Fold' : ''">
-          <img src="../assets/images/paper_1.png" alt class="paper-1" />
-          <div class="sender">
-            <div class="title">
-              <div>收</div>
-              <div>件</div>
-              <div>人</div>
-            </div>
-            <div class="info">
-              <div class="name">
-                <span>姓名：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.reciever.name" />
+      <div class="paper" :class="isSubmit ? 'paperMove' : ''">
+        <div class="paper-1">
+          <div class="backside" :class="isSubmit ? 'backFold': ''"></div>
+          <div class="cover" :class="isSubmit ? 'coverFold' : ''">
+            <img src="../assets/images/paper_1.png" alt class="paper-1" />
+            <div class="sender">
+              <div class="title">
+                <div>收</div>
+                <div>件</div>
+                <div>人</div>
+              </div>
+              <div class="info">
+                <div class="name">
+                  <span>姓名：</span>
+                  <input :disabled="!isEdit" v-model="expressInfo.reciever.name" />
+                </div>
+
+                <div class="phone">
+                  <span>电话：</span>
+                  <input :disabled="!isEdit" v-model="expressInfo.reciever.phone" />
+                </div>
               </div>
 
-              <div class="phone">
-                <span>电话：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.reciever.phone" />
+              <div class="address">
+                <span>所在地区：</span>
+                <v-distpicker
+                  :disabled="!isEdit"
+                  @selected="onRecieverSelected"
+                  :province="expressInfo.reciever.province"
+                  :city="expressInfo.reciever.city"
+                  :area="expressInfo.reciever.area"
+                ></v-distpicker>
               </div>
-            </div>
-
-            <div class="address">
-              <span>所在地区：</span>
-              <v-distpicker
-                :disabled="!isEdit"
-                @selected="onRecieverSelected"
-                :province="expressInfo.reciever.province"
-                :city="expressInfo.reciever.city"
-                :area="expressInfo.reciever.area"
-              ></v-distpicker>
             </div>
           </div>
         </div>
@@ -301,8 +304,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  transform-style: preserve-3d;
-  perspective: 1500px;
   position: absolute;
   bottom: 220px;
   left: calc((100vw - 660px) * 0.5);
@@ -312,18 +313,27 @@ export default {
 .paper-1 {
   width: 660px;
   height: 483px;
-  transform-origin: center bottom;
   position: relative;
+  perspective: 1300px;
+  z-index: 30;
 }
 
-.paper-1 .backside {
+.cover,
+.backside {
+  position: absolute;
   width: 100%;
   height: 100%;
-  background: #fff;
-  transform: rotateY(180deg);
-  position: absolute;
-  left: 0;
-  top: 0;
+  transform-origin: center bottom;
+}
+
+.cover {
+  transform: rotateX(0deg);
+  backface-visibility: hidden;
+}
+
+.backside {
+  background-color: #e3d9d0;
+  transform: rotateY(0deg);
 }
 
 .paper-1 img {
@@ -344,6 +354,7 @@ export default {
   justify-content: space-around;
   font-size: 20px;
   padding-left: 10px;
+  z-index: 31;
 }
 
 .title {
@@ -394,6 +405,7 @@ export default {
 }
 
 .address >>> .distpicker-address-wrapper select {
+  appearance: none;
   padding: 0 1px;
   outline-style: none;
   background: transparent;
@@ -539,14 +551,23 @@ export default {
   }
 }
 
-.paper1Fold {
-  animation: paper1Fold 1s 1s linear forwards;
+.coverFold {
+  animation: coverFold 1s 1s linear forwards;
 }
 
-@keyframes paper1Fold {
+@keyframes coverFold {
   100% {
-    transform: rotateX(-179deg);
-    transform-origin: 0 100%;
+    transform: rotateX(-180deg);
+  }
+}
+
+.backFold {
+  animation: backFold 1s 1s linear forwards;
+}
+
+@keyframes backFold {
+  100% {
+    transform: rotateX(-180deg)
   }
 }
 

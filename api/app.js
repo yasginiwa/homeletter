@@ -2,14 +2,6 @@ const Koa = require('koa')
 const router = require('koa-router')()
 const routes = require('./routes/index')
 const bodyParser = require('koa-bodyparser')
-// const https = require('https')
-// const fs = require('fs')
-
-//  https密钥配置选项
-// let options = {
-//     key: fs.readFileSync('cert/tianxi.hgsp.cn.key', 'utf-8'),
-//     cert: fs.readFileSync('cert/tianxi.hgsp.cn.pem', 'utf-8')
-// };
     
 let app = new Koa()
 
