@@ -18,6 +18,6 @@ var decode = function decode(base64) {
 // };
 
 module.exports = {
-  encode: encode,
-  decode: decode
+  encode,
+  decode
 }

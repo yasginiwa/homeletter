@@ -41,16 +41,13 @@ let decryptContent = (content) => {
 /**
  * 一网烘焙加密接口请求函数封装
  */
-let _req = (url, content, methodType = 'get') => {
-    return new Promise((res, reject) => {
+let _req = (url, content) => {
+    return new Promise((resolve, reject) => {
         //  组合url
         url = config.baseUrl + url
 
         //  判断内容
         content = content || {}
-
-        //  判断请求方法 只封装了常用的 get 和 post 请求
-        methodType = methodType || {}
 
         //  给内容添加时间戳
         content.timestamp = format('yyyy-MM-dd hh:mm:ss', new Date())
@@ -68,64 +65,56 @@ let _req = (url, content, methodType = 'get') => {
             content: encContent
         }
 
-        //  请求参数序列化
+        //  请求参数反序列化
         let paramStrings = querystring.stringify(params)
 
-        if (methodType === 'get') {// 发送GET请求
-            request({
-                url,
-                headers: {
-                    "Content-length": paramStrings.length,
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: paramStrings
-
-            }, (err, res, body) => {    // GET请求成功
-
-                let bodyObj = JSON.parse(JSON.parse(body))
-
-                if (!err && res.statusCode == 200 && bodyObj.code == 0) {
-
-                    let decContent = decryptContent(bodyObj.content)
-
-                    resolve(decContent)
-
-                } else {    // GET请求失败
-
-                    reject(bodyObj.msg)
-                }
-            })
-
-        } else {    // 发送POST请求
-
-            request.post({
-                url,
-                headers: {
-                    "Content-length": paramStrings.length,
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: paramStrings
-
-            }, (err, res, body) => { // POST请求成功
-
-                let bodyObj = JSON.parse(JSON.parse(body))
-
-                if (!err && res.statusCode == 200 && bodyObj.code === 0) {
-
-                    let decContent = decryptContent(bodyObj.content)
-
-                    resolve(decContent)
-
-                } else {    // POST请求失败
-
-                    reject(bodyObj.msg)
-                }
-            })
+        //  设置请求头
+        let headers = {
+            "Content-length": paramStrings.length,
+            "Content-Type": "application/x-www-form-urlencoded"
         }
+
+        //  向一网烘焙服务器发起请求 并讲结果通过Promise传出
+        request.post({
+            url,
+            headers, 
+            body: paramStrings
+
+        }, (err, res, body) => { // POST请求成功
+
+            let bodyObj = JSON.parse(JSON.parse(body))
+
+            if (!err && res.statusCode == 200 && bodyObj.code === 0) {
+
+                let decContent = decryptContent(bodyObj.content)
+
+                resolve(decContent)
+
+            } else {    // POST请求失败
+
+                reject(bodyObj.msg)
+            }
+        })
+
 
     })
 }
 
+/**
+ * 请求过程封装
+ */
+let netbakeRequest = (url, content) => {
+    return new Promise((resolve, reject) => {
+        _req(url, content)
+            .then(res => {
+                resolve({ code: 200, msg: 'ok', data: { result: res } })
+            })
+            .catch(err => {
+                reject({ code: 400, msg: 'error', data: { result: err } })
+            })
+    })
+}
+
 module.exports = {
-    _req
+    netbakeRequest
 }
