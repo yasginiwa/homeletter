@@ -4,6 +4,7 @@ const request = require('request')
 const querystring = require('querystring')
 const URLSafeBase64 = require('./URLSafeBase64')
 const format = require('date-format')
+const { type } = require('os')
 
 /**
  * 返回加盐后签名
@@ -77,25 +78,38 @@ let _req = (url, content) => {
         //  向一网烘焙服务器发起请求 并讲结果通过Promise传出
         request.post({
             url,
-            headers, 
+            headers,
             body: paramStrings
 
-        }, (err, res, body) => { // POST请求成功
+        }, (err, res, body) => { // 发送POST请求
 
-            let bodyObj = JSON.parse(JSON.parse(body))
+            let bodyObj = JSON.parse(body)
 
-            if (!err && res.statusCode == 200 && bodyObj.code === 0) {
+            //  判断bodyObj是否是对象
+            let objFlag = !(bodyObj instanceof Array) && typeof bodyObj == 'object'
 
-                let decContent = decryptContent(bodyObj.content)
+            //  如果bodyObj不是对象 且 存在返回code(code成功为0 所有取反为真) 且 code为0时 才是请求成功
+            if (!objFlag && !JSON.parse(bodyObj).code && JSON.parse(bodyObj).code === 0) { //  POST请求成功
+
+                //  由于跨域问题 返回的字符串带转义符 需序列化2次才能得到 body 对象
+                resObject = JSON.parse(bodyObj)
+
+                let decContent = decryptContent(resObject.content)
+
+                console.log('success')
 
                 resolve(decContent)
 
             } else {    // POST请求失败
 
-                reject(bodyObj.msg)
-            }
-        })
+                console.log('fail')
+                console.log(bodyObj)
+                reject(bodyObj.Message || reject(JSON.parse(bodyObj).msg))
 
+            }
+
+
+        })
 
     })
 }

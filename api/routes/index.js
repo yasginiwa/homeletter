@@ -10,8 +10,10 @@ router.post('postinfoquery', async (ctx, next) => {
     //  利用bodyParser中间件 获取请求体中的参数 content
     let content = ctx.request.body
 
+    //  获取请求url
     let url = ctx.request.url
 
+    //  响应体中直接返回解密后的结果 或 请求错误消息
     ctx.response.body = await netbake.netbakeRequest(url, content).catch(err => ctx.response.body = err)
 
     next()
