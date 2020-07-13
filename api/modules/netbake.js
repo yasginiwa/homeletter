@@ -96,13 +96,13 @@ let _req = (url, content) => {
 
                 let decContent = decryptContent(resObject.content)
 
-                console.log('success')
-
+                console.log('success---')
+                console.log(decContent)
                 resolve(decContent)
 
             } else {    // POST请求失败
 
-                console.log('fail')
+                console.log('fail---')
                 console.log(bodyObj)
                 reject(bodyObj.Message || reject(JSON.parse(bodyObj).msg))
 

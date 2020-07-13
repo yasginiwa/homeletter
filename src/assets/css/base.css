@@ -21,6 +21,7 @@ body {
     -webkit-tap-highlight-color: transparent; /* webkit是苹果浏览器核心 tap点击 highlight 背景高亮 color颜色 颜色用数字调节 */
     /*background: var(--color-background);  背景色 */
     width: 100vw; /* 宽度为百分百视口宽度 */
+    height: 100vh;
     padding: 0;
     margin: 0;
     -webkit-touch-callout: none;

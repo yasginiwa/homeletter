@@ -160,6 +160,7 @@ export default {
   },
 
   mounted() {
+    //  兼容安卓界面被输入工具栏顶起问题
     var height = document.documentElement.clientHeight; //获取当前可视区域的高度存到hrt变量
     window.onload = function() {
       //在页面整体加载完毕时
@@ -273,7 +274,7 @@ export default {
 
 .logo {
   width: 100%;
-  height: 100px;
+  height: 130px;
   position: relative;
 }
 
@@ -283,14 +284,14 @@ export default {
 }
 
 .logo img:nth-child(1) {
-  width: 100px;
-  height: 100px;
-  right: 135px;
+  width: 80px;
+  height: 80px;
+  right: 105px;
 }
 
 .logo img:nth-child(2) {
-  width: 105px;
-  height: 100px;
+  width: 84px;
+  height: 80px;
   right: 0;
 }
 
@@ -305,7 +306,7 @@ export default {
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: 220px;
+  bottom: 240px;
   left: calc((100vw - 660px) * 0.5);
   z-index: 30;
 }
