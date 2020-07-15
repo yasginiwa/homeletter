@@ -140,26 +140,26 @@ export default {
       isSubmit: false,
       isEdit: true,
       isExpand: true,
-      envelopeDesc: "",
+      envelopeDesc: '',
       expressInfo: {
-        Receiver: {
-          Name: "",
-          Phone: "",
-          Province: "",
-          City: "",
-          District: "",
-          Address: ""
-        },
         Sender: {
-          Name: "",
-          Phone: "",
-          Province: "",
-          City: "",
-          District: "",
-          Address: ""
+          Name: '',
+          Phone: '',
+          Province: '',
+          City: '',
+          District: '',
+          Address: ''
+        },
+        Receiver: {
+          Name: '',
+          Phone: '',
+          Provice: '',
+          City: '',
+          District: '',
+          Address: ''
         }
       }
-    }
+    };
   },
 
   mounted() {
@@ -168,11 +168,12 @@ export default {
     window.onload = function() {
       //在页面整体加载完毕时
       document.querySelector(".letter").style.height = height + "px"; //把获取到的高度赋值给根div
-    }
+    };
 
-    this.$watch('postid', (newVal, oldVal) => {
-      this.queryPostinfo(newVal)
-    })
+    this.$watch("postid", (newVal, oldVal) => {
+      this.$loading.show('加载中...')
+      this.queryPostinfo(newVal);
+    });
   },
 
   methods: {
@@ -184,14 +185,20 @@ export default {
           postid
         }
       }).then(res => {
-        this.expressInfo.Receiver = res.data.data.result.Receiver
-        this.expressInfo.Sender = res.data.data.result.
-        // let { sender: { name, phone, Province, city, area: district, detail: address }, reciever: { name, phone, province, city, area: district, detail: address } } = res.data
-        console.log(res.data.data.result.receiver)
-        // let reciever = res.data.data.result.Receiver
-        // let sender = res.data.sender
-        // this.expressInfo.reciever = 
-        //  this.res.result.reciever
+        //  隐藏加载框
+        this.$loading.hide()
+
+        //  解构请求结果
+        let { result } = res.data.data
+        
+        //  如请求到postid无任何信息 则表示未填写快递信息 直接返回
+        if (!result) return
+
+        //  将结果给expressInfo赋值
+        this.expressInfo = result
+
+        //  禁用form表单
+        this.isEdit = false
       });
     },
 
@@ -206,14 +213,20 @@ export default {
            * 完整 提交 网络请求
            * 不完整 弹框提示
            */
-          let { reciever, sender } = this.expressInfo;
+          let { Receiver, Sender } = this.expressInfo;
           if (
-            this.objHasAllValues(Object.values(reciever)) &&
-            this.objHasAllValues(Object.values(sender))
+            this.objHasAllValues(Object.values(Receiver)) &&
+            this.objHasAllValues(Object.values(Sender))
           ) {
             this.$loading.show("提交中...");
             request({
-              url: "/home/multidata"
+              url: "/postinfoupdate",
+              method: 'POST',
+              data: {
+                postid: this.postid,
+                receiver: this.expressInfo.Receiver,
+                sender: this.expressInfo.Sender
+              }
             })
               .then(res => {
                 // 请求成功
@@ -416,8 +429,15 @@ export default {
   background: transparent;
   border: none;
   border-bottom: 1px solid #004e92;
-  width: 150px;
   border-radius: 0;
+}
+
+.name input {
+  width: 130px;
+}
+
+.phone input{
+  width: 180px;
 }
 
 .address {

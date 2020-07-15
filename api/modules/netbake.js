@@ -96,7 +96,7 @@ let _req = (url, content) => {
             let objFlag = !(bodyObj instanceof Array) && typeof bodyObj == 'object'
 
             //  如果bodyObj不是对象 且 存在返回code(code成功为0 所有取反为真) 且 code为0时 才是请求成功
-            if (!objFlag && !JSON.parse(bodyObj).code && JSON.parse(bodyObj).code === 0) { //  POST请求成功
+            if (!objFlag && !JSON.parse(bodyObj).code && JSON.parse(bodyObj).code === 0) { //  POST请求成功 code为0表示查到相应快递信息 code为15201为未查到相应快递信息
 
                 //  由于跨域问题 返回的字符串带转义符 需序列化2次才能得到 body 对象
                 resObject = JSON.parse(bodyObj)
@@ -111,7 +111,7 @@ let _req = (url, content) => {
 
                 console.log('fail---')
                 console.log(bodyObj)
-                reject(bodyObj.Message || reject(JSON.parse(bodyObj).msg))
+                reject(bodyObj.Message) || reject(JSON.parse(bodyObj).msg)
 
             }
 
