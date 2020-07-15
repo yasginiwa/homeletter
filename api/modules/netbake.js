@@ -35,8 +35,15 @@ let encryptContent = (content) => {
  */
 let decryptContent = (content) => {
     let decContent = (CryptoJS.AES.decrypt(URLSafeBase64.decode(content), CryptoJS.enc.Utf8.parse(appKeyStr), options))
-    return JSON.parse(CryptoJS.enc.Utf8.stringify(decContent))
+    decContent = CryptoJS.enc.Utf8.stringify(decContent)
+
+    if (decContent.indexOf('{') == 0) { //  解密结果字符串含'{}'标识 直接序列化
+        return JSON.parse(CryptoJS.enc.Utf8.stringify(decContent))
+    } else {    //  解密结果字符串不含'{}'标识 加上后再序列化
+        return JSON.parse('{' + decContent + '}')
+    }
 }
+
 
 
 /**

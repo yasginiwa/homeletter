@@ -19,12 +19,12 @@
               <div class="info">
                 <div class="name">
                   <span>姓名：</span>
-                  <input :disabled="!isEdit" v-model="expressInfo.reciever.name" />
+                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.Name" />
                 </div>
 
                 <div class="phone">
                   <span>电话：</span>
-                  <input :disabled="!isEdit" v-model="expressInfo.reciever.phone" />
+                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.Phone" />
                 </div>
               </div>
 
@@ -33,9 +33,9 @@
                 <v-distpicker
                   :disabled="!isEdit"
                   @selected="onRecieverSelected"
-                  :province="expressInfo.reciever.province"
-                  :city="expressInfo.reciever.city"
-                  :area="expressInfo.reciever.area"
+                  :province="expressInfo.Receiver.Provice"
+                  :city="expressInfo.Receiver.City"
+                  :area="expressInfo.Receiver.District"
                 ></v-distpicker>
               </div>
             </div>
@@ -46,7 +46,7 @@
           <div class="poster">
             <div class="detail">
               <span>详细地址：</span>
-              <input :disabled="!isEdit" v-model="expressInfo.reciever.detail" />
+              <input :disabled="!isEdit" v-model="expressInfo.Receiver.Address" />
             </div>
 
             <div class="title">
@@ -57,12 +57,12 @@
             <div class="info">
               <div class="name">
                 <span>姓名：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.sender.name" />
+                <input :disabled="!isEdit" v-model="expressInfo.Sender.Name" />
               </div>
 
               <div class="phone">
                 <span>电话：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.sender.phone" />
+                <input :disabled="!isEdit" v-model="expressInfo.Sender.Phone" />
               </div>
             </div>
 
@@ -71,15 +71,15 @@
               <v-distpicker
                 @selected="onSenderSelected"
                 :disabled="!isEdit"
-                :province="expressInfo.sender.province"
-                :city="expressInfo.sender.city"
-                :area="expressInfo.sender.area"
+                :province="expressInfo.Sender.Province"
+                :city="expressInfo.Sender.City"
+                :area="expressInfo.Sender.District"
               ></v-distpicker>
             </div>
 
             <div class="detail">
               <span>详细地址：</span>
-              <input :disabled="!isEdit" v-model="expressInfo.sender.detail" />
+              <input :disabled="!isEdit" v-model="expressInfo.Sender.Address" />
             </div>
           </div>
           <div
@@ -131,6 +131,9 @@ export default {
   components: {
     VDistpicker
   },
+
+  props: ["postid"],
+
   data() {
     return {
       isTouched: false,
@@ -139,24 +142,24 @@ export default {
       isExpand: true,
       envelopeDesc: "",
       expressInfo: {
-        reciever: {
-          name: "",
-          phone: "",
-          province: "",
-          city: "",
-          area: "",
-          detail: ""
+        Receiver: {
+          Name: "",
+          Phone: "",
+          Province: "",
+          City: "",
+          District: "",
+          Address: ""
         },
-        sender: {
-          name: "",
-          phone: "",
-          province: "",
-          city: "",
-          area: "",
-          detail: ""
+        Sender: {
+          Name: "",
+          Phone: "",
+          Province: "",
+          City: "",
+          District: "",
+          Address: ""
         }
       }
-    };
+    }
   },
 
   mounted() {
@@ -165,10 +168,33 @@ export default {
     window.onload = function() {
       //在页面整体加载完毕时
       document.querySelector(".letter").style.height = height + "px"; //把获取到的高度赋值给根div
-    };
+    }
+
+    this.$watch('postid', (newVal, oldVal) => {
+      this.queryPostinfo(newVal)
+    })
   },
 
   methods: {
+    queryPostinfo(postid) {
+      request({
+        url: "/postinfoquery",
+        method: "POST",
+        data: {
+          postid
+        }
+      }).then(res => {
+        this.expressInfo.Receiver = res.data.data.result.Receiver
+        this.expressInfo.Sender = res.data.data.result.
+        // let { sender: { name, phone, Province, city, area: district, detail: address }, reciever: { name, phone, province, city, area: district, detail: address } } = res.data
+        console.log(res.data.data.result.receiver)
+        // let reciever = res.data.data.result.Receiver
+        // let sender = res.data.sender
+        // this.expressInfo.reciever = 
+        //  this.res.result.reciever
+      });
+    },
+
     submit(e) {
       this.$confirm({
         title: "提示",
@@ -250,15 +276,15 @@ export default {
     },
     onRecieverSelected(data) {
       let { province, city, area } = data;
-      this.expressInfo.reciever.province = province.value;
-      this.expressInfo.reciever.city = city.value;
-      this.expressInfo.reciever.area = area.value;
+      this.expressInfo.Receiver.Provice = province.value;
+      this.expressInfo.Receiver.City = city.value;
+      this.expressInfo.Receiver.District = area.value;
     },
     onSenderSelected(data) {
       let { province, city, area } = data;
-      this.expressInfo.sender.province = province.value;
-      this.expressInfo.sender.city = city.value;
-      this.expressInfo.sender.area = area.value;
+      this.expressInfo.Sender.Province = province.value;
+      this.expressInfo.Sender.City = city.value;
+      this.expressInfo.Sender.District = area.value;
     }
   }
 };
@@ -568,7 +594,7 @@ export default {
 
 @keyframes backFold {
   100% {
-    transform: rotateX(-180deg)
+    transform: rotateX(-180deg);
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <letter></letter>
+      <letter :postid=postid></letter>
   </div>
 </template>
 
@@ -9,8 +9,22 @@ import Letter from '@/views/Letter.vue'
 
 export default {
   name: 'App',
+  data() {
+    return {
+      postid: ''
+    }
+  },
+
   components: {
     Letter
+  },
+
+  mounted() {
+    //  获取当前url
+    let url = window.location.href
+
+    //  获取get参数 即postid
+    this.postid = url.split('=')[1]
   }
 }
 </script>

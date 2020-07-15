@@ -2,8 +2,11 @@ const Koa = require('koa')
 const router = require('koa-router')()
 const routes = require('./routes/index')
 const bodyParser = require('koa-bodyparser')
+const cors = require('@koa/cors')
     
 let app = new Koa()
+
+app.use(cors())
 
 app.use(bodyParser())
 
