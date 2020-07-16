@@ -201,13 +201,16 @@ export default {
         this.isEdit = false;
 
         this.envelopeDesc = "折叠";
-      });
+      })
+      .catch( err => {
+        this.$toast('网络不给力，请刷新网页...')
+      })
     },
 
     submit(e) {
       this.$confirm({
         title: "提示",
-        content: "是否已核对所有邮寄信息？"
+        content: "请仔细核对邮寄信息是否准确无误?"
       })
         .then(res => {
           /**
