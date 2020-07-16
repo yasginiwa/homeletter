@@ -19,12 +19,12 @@
               <div class="info">
                 <div class="name">
                   <span>姓名：</span>
-                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.Name" />
+                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.name" />
                 </div>
 
                 <div class="phone">
                   <span>电话：</span>
-                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.Phone" />
+                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.phone" />
                 </div>
               </div>
 
@@ -33,9 +33,9 @@
                 <v-distpicker
                   :disabled="!isEdit"
                   @selected="onRecieverSelected"
-                  :province="expressInfo.Receiver.Provice"
-                  :city="expressInfo.Receiver.City"
-                  :area="expressInfo.Receiver.District"
+                  :province="expressInfo.Receiver.province"
+                  :city="expressInfo.Receiver.city"
+                  :area="expressInfo.Receiver.district"
                 ></v-distpicker>
               </div>
             </div>
@@ -46,7 +46,7 @@
           <div class="poster">
             <div class="detail">
               <span>详细地址：</span>
-              <input :disabled="!isEdit" v-model="expressInfo.Receiver.Address" />
+              <input :disabled="!isEdit" v-model="expressInfo.Receiver.address" />
             </div>
 
             <div class="title">
@@ -57,12 +57,12 @@
             <div class="info">
               <div class="name">
                 <span>姓名：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.Sender.Name" />
+                <input :disabled="!isEdit" v-model="expressInfo.Sender.name" />
               </div>
 
               <div class="phone">
                 <span>电话：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.Sender.Phone" />
+                <input :disabled="!isEdit" v-model="expressInfo.Sender.phone" />
               </div>
             </div>
 
@@ -71,15 +71,15 @@
               <v-distpicker
                 @selected="onSenderSelected"
                 :disabled="!isEdit"
-                :province="expressInfo.Sender.Province"
-                :city="expressInfo.Sender.City"
-                :area="expressInfo.Sender.District"
+                :province="expressInfo.Sender.province"
+                :city="expressInfo.Sender.city"
+                :area="expressInfo.Sender.district"
               ></v-distpicker>
             </div>
 
             <div class="detail">
               <span>详细地址：</span>
-              <input :disabled="!isEdit" v-model="expressInfo.Sender.Address" />
+              <input :disabled="!isEdit" v-model="expressInfo.Sender.address" />
             </div>
           </div>
           <div
@@ -140,23 +140,23 @@ export default {
       isSubmit: false,
       isEdit: true,
       isExpand: true,
-      envelopeDesc: '',
+      envelopeDesc: "",
       expressInfo: {
         Sender: {
-          Name: '',
-          Phone: '',
-          Province: '',
-          City: '',
-          District: '',
-          Address: ''
+          name: "",
+          phone: "",
+          province: "",
+          city: "",
+          district: "",
+          address: ""
         },
         Receiver: {
-          Name: '',
-          Phone: '',
-          Provice: '',
-          City: '',
-          District: '',
-          Address: ''
+          name: "",
+          phone: "",
+          province: "",
+          city: "",
+          district: "",
+          address: ""
         }
       }
     };
@@ -171,7 +171,7 @@ export default {
     };
 
     this.$watch("postid", (newVal, oldVal) => {
-      this.$loading.show('加载中...')
+      this.$loading.show("加载中...");
       this.queryPostinfo(newVal);
     });
   },
@@ -186,26 +186,28 @@ export default {
         }
       }).then(res => {
         //  隐藏加载框
-        this.$loading.hide()
+        this.$loading.hide();
 
         //  解构请求结果
-        let { result } = res.data.data
-        
-        //  如请求到postid无任何信息 则表示未填写快递信息 直接返回
-        if (!result) return
+        let { result } = res.data.data;
+
+        //  ExpressState状态为0时 postid尚未使用 直接返回 可填写
+        if (result.Sender.name == "") return;
 
         //  将结果给expressInfo赋值
-        this.expressInfo = result
+        this.expressInfo = result;
 
         //  禁用form表单
-        this.isEdit = false
+        this.isEdit = false;
+
+        this.envelopeDesc = "折叠";
       });
     },
 
     submit(e) {
       this.$confirm({
         title: "提示",
-        content: "所有邮寄信息是否无误？"
+        content: "是否已核对所有邮寄信息？"
       })
         .then(res => {
           /**
@@ -213,19 +215,27 @@ export default {
            * 完整 提交 网络请求
            * 不完整 弹框提示
            */
-          let { Receiver, Sender } = this.expressInfo;
+          let { Receiver: receiver, Sender: sender } = this.expressInfo;
+          let data = {
+            postid: this.postid,
+            receiver,
+            sender
+          };
+
           if (
-            this.objHasAllValues(Object.values(Receiver)) &&
-            this.objHasAllValues(Object.values(Sender))
+            this.objHasAllValues(Object.values(receiver)) &&
+            this.objHasAllValues(Object.values(sender)) &&
+            receiver.phone.length == 11 &&
+            sender.phone.length == 11
           ) {
             this.$loading.show("提交中...");
             request({
               url: "/postinfoupdate",
-              method: 'POST',
+              method: "POST",
               data: {
                 postid: this.postid,
-                receiver: this.expressInfo.Receiver,
-                sender: this.expressInfo.Sender
+                receiver,
+                sender
               }
             })
               .then(res => {
@@ -235,7 +245,6 @@ export default {
                   this.$loading.hide();
                   this.$toast("手机网络不给力...");
                 } else {
-                  console.log(res);
                   this.$loading.hide();
                   this.$toast("提交成功，谢谢惠顾！");
                   this.isSubmit = true;
@@ -289,15 +298,15 @@ export default {
     },
     onRecieverSelected(data) {
       let { province, city, area } = data;
-      this.expressInfo.Receiver.Provice = province.value;
-      this.expressInfo.Receiver.City = city.value;
-      this.expressInfo.Receiver.District = area.value;
+      this.expressInfo.Receiver.province = province.value;
+      this.expressInfo.Receiver.city = city.value;
+      this.expressInfo.Receiver.district = area.value;
     },
     onSenderSelected(data) {
       let { province, city, area } = data;
-      this.expressInfo.Sender.Province = province.value;
-      this.expressInfo.Sender.City = city.value;
-      this.expressInfo.Sender.District = area.value;
+      this.expressInfo.Sender.province = province.value;
+      this.expressInfo.Sender.city = city.value;
+      this.expressInfo.Sender.district = area.value;
     }
   }
 };
@@ -436,7 +445,7 @@ export default {
   width: 130px;
 }
 
-.phone input{
+.phone input {
   width: 180px;
 }
 

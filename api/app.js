@@ -3,6 +3,14 @@ const router = require('koa-router')()
 const routes = require('./routes/index')
 const bodyParser = require('koa-bodyparser')
 const cors = require('koa2-cors')
+// const https = require('https')
+// const fs = require('fs')
+
+//  https密钥配置选项
+// let options = {
+//     key: fs.readFileSync('certs/express.hgsp.cn.key', 'utf-8'),
+//     cert: fs.readFileSync('certs/express.hgsp.cn.pem', 'utf-8')
+// }
     
 let app = new Koa()
 
