@@ -5,6 +5,8 @@ const bodyParser = require('koa-bodyparser')
 const cors = require('koa2-cors')
 const https = require('https')
 const fs = require('fs')
+const request = require('request')
+const { setInterval } = require('core-js')
 
 //  https密钥配置选项
 let options = {
@@ -22,6 +24,22 @@ router.use('/', routes)
 
 app.use(router.routes())
     .use(router.allowedMethods())
+
+//  由于接口长时间不调用 首次调用时卡顿
+setInterval(() => {
+    request.post({
+        headers: 'application/json',
+        url: 'https://express.hgsp.cn:10447/postinfoquery',
+        json: true,
+        body: {
+            postid: 'R20190003513077487'
+        }
+    }, (err, res) => {
+        console.log('keepAlive--- 1分钟1次')
+    })
+}, 60 * 1000)
+
+
 
 
 //  http服务

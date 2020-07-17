@@ -444,6 +444,11 @@ export default {
   border-radius: 0;
 }
 
+input:disabled {
+  color: #666;
+}
+
+
 .name input {
   width: 130px;
 }
@@ -474,6 +479,21 @@ export default {
   width: 120px;
   font-size: 20px;
   margin-right: 5px;
+  -webkit-text-fill-color: #000;
+  color: #000;
+  opacity: 1;
+}
+
+.address >>> .distpicker-address-wrapper select:disabled {
+  -webkit-text-fill-color: #666;
+  color: #666;
+  opacity: 1;
+}
+
+input:disabled {
+  -webkit-text-fill-color: #666;
+  color: #666;
+  opacity: 1;
 }
 
 .sender > .address {
