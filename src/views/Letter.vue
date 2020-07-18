@@ -15,6 +15,10 @@
                 <div>收</div>
                 <div>件</div>
                 <div>人</div>
+                <div class="modifyinfo" v-show="!isEdit" @click="modifyInfo">
+                  <img src="../assets/images/modify.png" alt />
+                  <i>修改</i>
+                </div>
               </div>
               <div class="info">
                 <div class="name">
@@ -184,27 +188,29 @@ export default {
         data: {
           postid
         }
-      }).then(res => {
-        //  隐藏加载框
-        this.$loading.hide();
-
-        //  解构请求结果
-        let { result } = res.data.data;
-
-        //  ExpressState状态为0时 postid尚未使用 直接返回 可填写
-        if (result.Sender.name == "") return;
-
-        //  将结果给expressInfo赋值
-        this.expressInfo = result;
-
-        //  禁用form表单
-        this.isEdit = false;
-
-        this.envelopeDesc = "折叠";
       })
-      .catch( err => {
-        this.$toast('网络不给力，请刷新网页...')
-      })
+        .then(res => {
+          //  隐藏加载框
+          this.$loading.hide();
+
+          //  解构请求结果
+          let { result } = res.data.data;
+
+          //  ExpressState状态为0时 postid尚未使用 直接返回 可填写
+          if (result.Sender.name == "") return;
+
+          //  将结果给expressInfo赋值
+          this.expressInfo = result;
+
+          //  禁用form表单
+          this.isEdit = false;
+
+          //  折叠-展开按钮显示 "折叠" 文字
+          this.envelopeDesc = "折叠";
+        })
+        .catch(err => {
+          this.$toast("网络不给力，请刷新页面...");
+        });
     },
 
     submit(e) {
@@ -219,6 +225,11 @@ export default {
            * 不完整 弹框提示
            */
           let { Receiver: receiver, Sender: sender } = this.expressInfo;
+
+          //  请求到的town字段暂时无用 为了判断是否有值 用 略 代替
+          receiver.town = "略";
+          sender.town = "略";
+
           let data = {
             postid: this.postid,
             receiver,
@@ -242,12 +253,36 @@ export default {
               }
             })
               .then(res => {
-                // 请求成功
+                let localExpressInfo = JSON.parse(
+                  localStorage.getItem("localExpressInfo")
+                );
+
+                if (localExpressInfo) {
+                  let { phone: currentPhone } = this.expressInfo.Sender;
+                  let { phone: localPhone } = localExpressInfo.Sender;
+
+                  if (currentPhone !== localPhone) {
+                    this.$loading.hide();
+                    this.$toast("寄件人手机修改，确认信件是否属于本人?");
+                    this.expressInfo.Sender = localExpressInfo.Sender;
+                    this.isEdit = false
+                    return;
+                  }
+                } else {
+                  localStorage.setItem(
+                    "localExpressInfo",
+                    JSON.stringify(this.expressInfo)
+                  );
+                }
+
                 if (!res) {
+                  //  请求失败
                   console.log("失败");
                   this.$loading.hide();
                   this.$toast("手机网络不给力...");
                 } else {
+                  //  请求失败
+                  console.log(res);
                   this.$loading.hide();
                   this.$toast("提交成功，谢谢惠顾！");
                   this.isSubmit = true;
@@ -265,8 +300,14 @@ export default {
           }
         })
         .catch(err => {
-          //请求失败
-          // console.log(err);
+          //请求失败 code "15210", "邮件已提交快递，不允许再更新"
+          if (parseInt(err.code) === 15210) {
+            this.$toast(err.msg);
+            this.isEdit = false
+            return
+          } else {
+            this.$toast("提交失败");
+          }
         });
     },
 
@@ -283,6 +324,8 @@ export default {
       }
       return true;
     },
+
+    //  提交按钮 hover 状态 class 改变
     touchbegin() {
       this.isTouched = true;
     },
@@ -310,6 +353,11 @@ export default {
       this.expressInfo.Sender.province = province.value;
       this.expressInfo.Sender.city = city.value;
       this.expressInfo.Sender.district = area.value;
+    },
+
+    //  修改邮寄信息
+    modifyInfo() {
+      this.isEdit = true;
     }
   }
 };
@@ -426,6 +474,31 @@ export default {
   margin-right: 10px;
 }
 
+.title .modifyinfo {
+  background: #aaa;
+  width: 90px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 5px;
+  position: absolute;
+  right: 0px;
+  top: 10px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.modifyinfo img {
+  width: 24px;
+  height: 24px;
+}
+
+.modifyinfo i {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 20px;
+}
+
 .info {
   display: flex;
   color: #004e92;
@@ -448,7 +521,6 @@ input:disabled {
   color: #666;
 }
 
-
 .name input {
   width: 130px;
 }
@@ -470,11 +542,9 @@ input:disabled {
 
 .address >>> .distpicker-address-wrapper select {
   appearance: none;
-  padding: 0 1px;
   outline-style: none;
   background: transparent;
-  height: 36px;
-  line-height: 40px;
+  height: 40px;
   border: 1px #004e92 solid;
   width: 120px;
   font-size: 20px;
@@ -482,6 +552,8 @@ input:disabled {
   -webkit-text-fill-color: #000;
   color: #000;
   opacity: 1;
+  padding: 0 2%;
+  margin: 0;
 }
 
 .address >>> .distpicker-address-wrapper select:disabled {

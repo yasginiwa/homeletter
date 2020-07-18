@@ -107,7 +107,7 @@ let _req = (url, content) => {
 
                 console.log('fail---')
                 console.log(bodyObj)
-                reject(bodyObj.Message) || reject(JSON.parse(bodyObj).msg)
+                bodyObj.Message ? reject(bodyObj.Message) : reject(JSON.parse(bodyObj))
 
             }
 
@@ -124,7 +124,7 @@ let netbakeRequest = (url, content) => {
     return new Promise((resolve, reject) => {
         _req(url, content)
             .then(res => {
-                resolve({ code: 200, msg: 'ok', data: { result: res } })
+                resolve({ code: 200, msg: 'ok', data: { result: res, msg: res.msg } })
             })
             .catch(err => {
                 reject({ code: 400, msg: 'error', data: { result: err } })
