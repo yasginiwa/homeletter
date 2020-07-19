@@ -66,7 +66,12 @@
 
               <div class="phone">
                 <span>电话：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.Sender.phone" />
+                <input
+                  :disabled="!isEdit"
+                  v-bind:readonly="isReadOnly"
+                  v-model="expressInfo.Sender.phone"
+                  @click="handleSenderPhone"
+                />
               </div>
             </div>
 
@@ -145,6 +150,7 @@ export default {
       isEdit: true,
       isExpand: true,
       envelopeDesc: "",
+      isReadOnly: false,
       expressInfo: {
         Sender: {
           name: "",
@@ -180,6 +186,11 @@ export default {
     });
   },
 
+  destroyed() {
+    //  清除本地缓存
+    localStorage.clear();
+  },
+
   methods: {
     queryPostinfo(postid) {
       request({
@@ -201,6 +212,9 @@ export default {
 
           //  将结果给expressInfo赋值
           this.expressInfo = result;
+
+          //  将结果存储到本地
+          localStorage.setItem("lExpressInfo", JSON.stringify(result));
 
           //  禁用form表单
           this.isEdit = false;
@@ -230,12 +244,6 @@ export default {
           receiver.town = "略";
           sender.town = "略";
 
-          let data = {
-            postid: this.postid,
-            receiver,
-            sender
-          };
-
           if (
             this.objHasAllValues(Object.values(receiver)) &&
             this.objHasAllValues(Object.values(sender)) &&
@@ -253,41 +261,37 @@ export default {
               }
             })
               .then(res => {
-                let localExpressInfo = JSON.parse(
-                  localStorage.getItem("localExpressInfo")
-                );
-
-                if (localExpressInfo) {
-                  let { phone: currentPhone } = this.expressInfo.Sender;
-                  let { phone: localPhone } = localExpressInfo.Sender;
-
-                  if (currentPhone !== localPhone) {
-                    this.$loading.hide();
-                    this.$toast("寄件人手机修改，确认信件是否属于本人?");
-                    this.expressInfo.Sender = localExpressInfo.Sender;
-                    this.isEdit = false
-                    return;
-                  }
-                } else {
-                  localStorage.setItem(
-                    "localExpressInfo",
-                    JSON.stringify(this.expressInfo)
-                  );
-                }
-
                 if (!res) {
                   //  请求失败
                   console.log("失败");
                   this.$loading.hide();
                   this.$toast("手机网络不给力...");
                 } else {
-                  //  请求失败
-                  console.log(res);
-                  this.$loading.hide();
-                  this.$toast("提交成功，谢谢惠顾！");
-                  this.isSubmit = true;
-                  this.isEdit = false;
-                  this.envelopeDesc = "展开";
+                  //  请求成功
+                  let { result } = res.data.data;
+                  //请求失败 code "15210", "邮件已提交快递，不允许再更新"
+                  if (result.code === 15210) {
+                    //  弹出"邮件已提交快递，不允许再更新"toast
+                    this.$toast(result.msg, {
+                      duration: 2500
+                    });
+                    //  由于不可更改 从本地取回快递信息 赋值给expressInfo模型
+                    this.expressInfo = JSON.parse(
+                      localStorage.getItem("lExpressInfo")
+                    );
+                    //  修改为form禁用
+                    this.isEdit = false;
+                    //  隐藏loading框
+                    this.$loading.hide();
+
+                    return;
+                  } else {
+                    this.$loading.hide();
+                    this.$toast("提交成功，谢谢惠顾！");
+                    this.isSubmit = true;
+                    this.isEdit = false;
+                    this.envelopeDesc = "展开";
+                  }
                 }
               })
               .catch(err => {
@@ -300,14 +304,7 @@ export default {
           }
         })
         .catch(err => {
-          //请求失败 code "15210", "邮件已提交快递，不允许再更新"
-          if (parseInt(err.code) === 15210) {
-            this.$toast(err.msg);
-            this.isEdit = false
-            return
-          } else {
-            this.$toast("提交失败");
-          }
+          console.log(err);
         });
     },
 
@@ -358,6 +355,15 @@ export default {
     //  修改邮寄信息
     modifyInfo() {
       this.isEdit = true;
+      //  设置寄件人电话为只读
+      this.isReadOnly = true;
+    },
+
+    handleSenderPhone() {
+      if (this.isReadOnly)
+        this.$toast("寄件人手机不可更改,请核对信件信息是否为本人!", {
+          duration: 4000
+        });
     }
   }
 };
