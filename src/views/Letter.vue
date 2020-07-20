@@ -1,5 +1,6 @@
 <template>
   <div class="letter">
+    <div class="letter-back"></div>
     <div class="logo">
       <img src="../assets/images/crown_logo.png" alt />
       <img src="../assets/images/post_logo.png" alt />
@@ -128,6 +129,10 @@
     </div>
     <div class="copyright">
       <span>武汉市玫隆皇冠食品有限公司 倾情出品</span>
+      <div class="logistics" @click="handleLogistics">
+        <img src="../assets/images/wuliu.png" alt="">
+        <span>查看物流</span>
+      </div>
     </div>
   </div>
 </template>
@@ -168,7 +173,8 @@ export default {
           district: "",
           address: ""
         }
-      }
+      },
+      express: []
     };
   },
 
@@ -213,6 +219,8 @@ export default {
           //  将结果给expressInfo赋值
           this.expressInfo = result;
 
+          this.express = result.express
+
           //  将结果存储到本地
           localStorage.setItem("lExpressInfo", JSON.stringify(result));
 
@@ -223,7 +231,9 @@ export default {
           this.envelopeDesc = "折叠";
         })
         .catch(err => {
-          this.$toast("网络不给力，请刷新页面...");
+          this.$toast("手机网络不给力，请点击右上角“刷新”页面！", {
+            duration: 2000
+          });
         });
     },
 
@@ -265,7 +275,9 @@ export default {
                   //  请求失败
                   console.log("失败");
                   this.$loading.hide();
-                  this.$toast("手机网络不给力...");
+                  this.$toast("手机网络不给力，请点击右上角“刷新”页面！", {
+                    duration: 2000
+                  });
                 } else {
                   //  请求成功
                   let { result } = res.data.data;
@@ -273,14 +285,17 @@ export default {
                   if (result.code === 15210) {
                     //  弹出"邮件已提交快递，不允许再更新"toast
                     this.$toast(result.msg, {
-                      duration: 2500
+                      duration: 2500
                     });
                     //  由于不可更改 从本地取回快递信息 赋值给expressInfo模型
-                    this.expressInfo = JSON.parse(
+                    let lExpressInfo = JSON.parse(
                       localStorage.getItem("lExpressInfo")
                     );
+                    this.expressInfo = lExpressInfo
+
                     //  修改为form禁用
                     this.isEdit = false;
+
                     //  隐藏loading框
                     this.$loading.hide();
 
@@ -297,13 +312,16 @@ export default {
               .catch(err => {
                 console.log("失败");
                 this.$loading.hide();
-                this.$toast("手机网络不给力...");
+                this.$toast("手机网络不给力，请点击右上角“刷新”页面！", {
+                  duration: 2000
+                });
               });
           } else {
             this.$toast("请填写完整邮寄信息！");
           }
         })
         .catch(err => {
+          this.isEdit = false
           console.log(err);
         });
     },
@@ -361,9 +379,14 @@ export default {
 
     handleSenderPhone() {
       if (this.isReadOnly)
-        this.$toast("寄件人手机不可更改,请核对信件信息是否为本人!", {
+        this.$toast("寄件人电话不可更改，请核对寄件人信息是否为本人！", {
           duration: 4000
         });
+    },
+
+    //  查看物流信息
+    handleLogistics() {
+      
     }
   }
 };
@@ -375,6 +398,7 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
+  z-index: 0;
 }
 
 .logo {
@@ -799,7 +823,44 @@ input:disabled {
   bottom: 0;
   padding: 5px;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   letter-spacing: 3px;
 }
+
+.copyright .logistics {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.copyright img {
+  width: 28px;
+  height: 28px;
+  margin-right: 4px;
+}
+
+.letter:hover {
+  transform-origin: center bottom;
+  transition: all .5s;
+  transform: rotateY(180deg);
+}
+
+.letter:hover .letter-back {
+  transform: rotateY(0);
+}
+
+.letter-back {
+  width: 100%;
+  height: 100%;
+  transform: rotateY(-180deg);
+  z-index: -50000;
+  background: brown;
+  backface-visibility: hidden;
+}
+
+
 </style>
