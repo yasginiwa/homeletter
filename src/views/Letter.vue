@@ -1,149 +1,171 @@
 <template>
-  <div class="letter">
-    <div class="letter-back"></div>
-    <div class="logo">
-      <img src="../assets/images/crown_logo.png" alt />
-      <img src="../assets/images/post_logo.png" alt />
-    </div>
-    <div class="paper-wrapper">
-      <div class="paper" :class="isSubmit ? 'paperMove' : ''">
-        <div class="paper-1">
-          <div class="backside" :class="isSubmit ? 'backFold': ''"></div>
-          <div class="cover" :class="isSubmit ? 'coverFold' : ''">
-            <img src="../assets/images/paper_1.png" alt class="paper-1" />
-            <div class="sender">
+  <div class="letter-wrapper">
+    <div class="letter">
+      <div class="logo">
+        <img src="../assets/images/crown_logo.png" alt />
+        <img src="../assets/images/post_logo.png" alt />
+      </div>
+      <div class="paper-wrapper">
+        <div class="paper" :class="isSubmit ? 'paperMove' : ''">
+          <div class="paper-1">
+            <div class="backside" :class="isSubmit ? 'backFold': ''"></div>
+            <div class="cover" :class="isSubmit ? 'coverFold' : ''">
+              <img src="../assets/images/paper_1.png" alt class="paper-1" />
+              <div class="sender">
+                <div class="title">
+                  <div>收</div>
+                  <div>件</div>
+                  <div>人</div>
+                  <div class="modifyinfo" v-show="!isEdit" @click="modifyInfo">
+                    <img src="../assets/images/modify.png" alt />
+                    <i>修改</i>
+                  </div>
+                </div>
+                <div class="info">
+                  <div class="name">
+                    <span>姓名：</span>
+                    <input :disabled="!isEdit" v-model="expressInfo.Receiver.name" />
+                  </div>
+
+                  <div class="phone">
+                    <span>电话：</span>
+                    <input :disabled="!isEdit" v-model="expressInfo.Receiver.phone" />
+                  </div>
+                </div>
+
+                <div class="address">
+                  <span>所在地区：</span>
+                  <v-distpicker
+                    :disabled="!isEdit"
+                    @selected="onRecieverSelected"
+                    :province="expressInfo.Receiver.province"
+                    :city="expressInfo.Receiver.city"
+                    :area="expressInfo.Receiver.district"
+                  ></v-distpicker>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="paper-2">
+            <img src="../assets/images/paper_2.png" alt class="paper-2" />
+            <div class="poster">
+              <div class="detail">
+                <span>详细地址：</span>
+                <input :disabled="!isEdit" v-model="expressInfo.Receiver.address" />
+              </div>
+
               <div class="title">
-                <div>收</div>
+                <div>寄</div>
                 <div>件</div>
                 <div>人</div>
-                <div class="modifyinfo" v-show="!isEdit" @click="modifyInfo">
-                  <img src="../assets/images/modify.png" alt />
-                  <i>修改</i>
-                </div>
               </div>
               <div class="info">
                 <div class="name">
                   <span>姓名：</span>
-                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.name" />
+                  <input :disabled="!isEdit" v-model="expressInfo.Sender.name" />
                 </div>
 
                 <div class="phone">
                   <span>电话：</span>
-                  <input :disabled="!isEdit" v-model="expressInfo.Receiver.phone" />
+                  <input
+                    :disabled="!isEdit"
+                    v-bind:readonly="isReadOnly"
+                    v-model="expressInfo.Sender.phone"
+                    @click="handleSenderPhone"
+                  />
                 </div>
               </div>
 
               <div class="address">
                 <span>所在地区：</span>
                 <v-distpicker
+                  @selected="onSenderSelected"
                   :disabled="!isEdit"
-                  @selected="onRecieverSelected"
-                  :province="expressInfo.Receiver.province"
-                  :city="expressInfo.Receiver.city"
-                  :area="expressInfo.Receiver.district"
+                  :province="expressInfo.Sender.province"
+                  :city="expressInfo.Sender.city"
+                  :area="expressInfo.Sender.district"
                 ></v-distpicker>
               </div>
-            </div>
-          </div>
-        </div>
-        <div class="paper-2">
-          <img src="../assets/images/paper_2.png" alt class="paper-2" />
-          <div class="poster">
-            <div class="detail">
-              <span>详细地址：</span>
-              <input :disabled="!isEdit" v-model="expressInfo.Receiver.address" />
-            </div>
 
-            <div class="title">
-              <div>寄</div>
-              <div>件</div>
-              <div>人</div>
-            </div>
-            <div class="info">
-              <div class="name">
-                <span>姓名：</span>
-                <input :disabled="!isEdit" v-model="expressInfo.Sender.name" />
-              </div>
-
-              <div class="phone">
-                <span>电话：</span>
-                <input
-                  :disabled="!isEdit"
-                  v-bind:readonly="isReadOnly"
-                  v-model="expressInfo.Sender.phone"
-                  @click="handleSenderPhone"
-                />
+              <div class="detail">
+                <span>详细地址：</span>
+                <input :disabled="!isEdit" v-model="expressInfo.Sender.address" />
               </div>
             </div>
-
-            <div class="address">
-              <span>所在地区：</span>
-              <v-distpicker
-                @selected="onSenderSelected"
-                :disabled="!isEdit"
-                :province="expressInfo.Sender.province"
-                :city="expressInfo.Sender.city"
-                :area="expressInfo.Sender.district"
-              ></v-distpicker>
-            </div>
-
-            <div class="detail">
-              <span>详细地址：</span>
-              <input :disabled="!isEdit" v-model="expressInfo.Sender.address" />
-            </div>
+            <div
+              @click="submit"
+              @touchstart="touchbegin"
+              @touchend="touchend"
+              :class="isTouched === true? 'active': 'submit'"
+              v-if="isEdit === true ? true : false"
+            >提交</div>
           </div>
-          <div
-            @click="submit"
-            @touchstart="touchbegin"
-            @touchend="touchend"
-            :class="isTouched === true? 'active': 'submit'"
-            v-if="isEdit === true ? true : false"
-          >提交</div>
         </div>
       </div>
-    </div>
-    <div class="envelope">
-      <img
-        src="../assets/images/envelope_upper.png"
-        alt
-        class="upper"
-        :class="isSubmit === true ? 'envelopeMove' : ''"
-      />
-      <div class="main">
+      <div class="envelope">
         <img
-          class="back"
-          src="../assets/images/envelope_back.png"
+          src="../assets/images/envelope_upper.png"
+          alt
+          class="upper"
           :class="isSubmit === true ? 'envelopeMove' : ''"
         />
-        <img
-          class="front"
-          src="../assets/images/envelope_front.png"
-          :class="isSubmit === true ? 'envelopeMoveFront' : ''"
-        />
-        <div
-          class="openBtn"
-          @click="expand"
-          :class="isSubmit === true ? 'envelopeOpen' : ''"
-        >{{ envelopeDesc }}</div>
+        <div class="main">
+          <img
+            class="back"
+            src="../assets/images/envelope_back.png"
+            :class="isSubmit === true ? 'envelopeMove' : ''"
+          />
+          <img
+            class="front"
+            src="../assets/images/envelope_front.png"
+            :class="isSubmit === true ? 'envelopeMoveFront' : ''"
+          />
+          <div
+            class="openBtn"
+            @click="expand"
+            :class="isSubmit === true ? 'envelopeOpen' : ''"
+          >{{ envelopeDesc }}</div>
+        </div>
+      </div>
+      <div class="copyright">
+        <span>武汉市玫隆皇冠食品有限公司 倾情出品</span>
+        <div class="logistics" @click="handleLogistics">
+          <img src="../assets/images/wuliu.png" alt />
+          <span>查看物流</span>
+        </div>
       </div>
     </div>
-    <div class="copyright">
-      <span>武汉市玫隆皇冠食品有限公司 倾情出品</span>
-      <div class="logistics" @click="handleLogistics">
-        <img src="../assets/images/wuliu.png" alt="">
-        <span>查看物流</span>
+
+    <div class="letter-back">
+      <div class="detail-header">
+        <img src="../assets/images/arrow_left.png" alt />
+        <span>物流详情</span>
       </div>
+      <div class="detail-product">
+        <img src="../assets/images/product.png" alt />
+      </div>
+      <div class="detail-status">
+        <span>订单状态</span>
+      </div>
+      <timeline>
+        <timeline-item >item1</timeline-item>
+        <timeline-item :hollow="true">item2</timeline-item>
+      </timeline>
     </div>
   </div>
 </template>
 
 <script>
 import VDistpicker from "v-distpicker";
+import { Timeline, TimelineItem, TimelineTitle } from 'vue-cute-timeline'
 import { request } from "@/network/request";
 
 export default {
   components: {
-    VDistpicker
+    VDistpicker,
+    Timeline,
+    TimelineItem,
+    TimelineTitle
   },
 
   props: ["postid"],
@@ -219,7 +241,7 @@ export default {
           //  将结果给expressInfo赋值
           this.expressInfo = result;
 
-          this.express = result.express
+          this.express = result.express;
 
           //  将结果存储到本地
           localStorage.setItem("lExpressInfo", JSON.stringify(result));
@@ -291,7 +313,7 @@ export default {
                     let lExpressInfo = JSON.parse(
                       localStorage.getItem("lExpressInfo")
                     );
-                    this.expressInfo = lExpressInfo
+                    this.expressInfo = lExpressInfo;
 
                     //  修改为form禁用
                     this.isEdit = false;
@@ -321,7 +343,7 @@ export default {
           }
         })
         .catch(err => {
-          this.isEdit = false
+          this.isEdit = false;
           console.log(err);
         });
     },
@@ -385,20 +407,25 @@ export default {
     },
 
     //  查看物流信息
-    handleLogistics() {
-      
-    }
+    handleLogistics() {}
   }
 };
 </script>
 
 <style scoped>
+.letter-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
 .letter {
   background: #004e92;
   width: 100%;
   height: 100%;
-  position: relative;
-  z-index: 0;
+  transform: rotateY(0deg);
+  position: absolute;
+  backface-visibility: hidden;
 }
 
 .logo {
@@ -843,24 +870,55 @@ input:disabled {
   margin-right: 4px;
 }
 
-.letter:hover {
-  transform-origin: center bottom;
-  transition: all .5s;
+.letter-wrapper:hover .letter {
+  transition: all 2s;
   transform: rotateY(180deg);
 }
 
-.letter:hover .letter-back {
+.letter-wrapper:hover .letter-back {
+  transition: all 2s;
   transform: rotateY(0);
 }
 
 .letter-back {
+  position: absolute;
   width: 100%;
   height: 100%;
   transform: rotateY(-180deg);
-  z-index: -50000;
-  background: brown;
+  background: #fff;
   backface-visibility: hidden;
 }
 
+.letter-back .detail-header {
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(189, 195, 199, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  font-weight: bolder;
+}
 
+.detail-header img {
+  width: 44px;
+  height: 44px;
+  position: absolute;
+  left: 20px;
+}
+
+.detail-product {
+  padding: 30px;
+}
+
+.detail-product img {
+  width: 150px;
+  height: 150px;
+  box-shadow: 0 0 4px rgba(189, 195, 199, 0.5);
+}
+
+.detail-status {
+  padding: 30px;
+  font-size: 28px;
+  color: #333;
+}
 </style>
