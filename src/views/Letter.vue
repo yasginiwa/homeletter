@@ -1,6 +1,6 @@
 <template>
   <div class="letter-wrapper">
-    <div class="letter">
+    <div class="letter" :class="[isRotated ? 'letter-rotation' : '', isRotateBack ? 'letter-unrotation' : '']">
       <div class="logo">
         <img src="../assets/images/crown_logo.png" alt />
         <img src="../assets/images/post_logo.png" alt />
@@ -96,8 +96,8 @@
               @click="submit"
               @touchstart="touchbegin"
               @touchend="touchend"
-              :class="isTouched === true? 'active': 'submit'"
-              v-if="isEdit === true ? true : false"
+              :class="isTouched ? 'active': 'submit'"
+              v-if="isEdit ? true : false"
             >提交</div>
           </div>
         </div>
@@ -107,50 +107,57 @@
           src="../assets/images/envelope_upper.png"
           alt
           class="upper"
-          :class="isSubmit === true ? 'envelopeMove' : ''"
+          :class="isSubmit ? 'envelopeMove' : ''"
         />
         <div class="main">
           <img
             class="back"
             src="../assets/images/envelope_back.png"
-            :class="isSubmit === true ? 'envelopeMove' : ''"
+            :class="isSubmit ? 'envelopeMove' : ''"
           />
           <img
             class="front"
             src="../assets/images/envelope_front.png"
-            :class="isSubmit === true ? 'envelopeMoveFront' : ''"
+            :class="isSubmit ? 'envelopeMoveFront' : ''"
           />
           <div
             class="openBtn"
             @click="expand"
-            :class="isSubmit === true ? 'envelopeOpen' : ''"
+            :class="isSubmit ? 'envelopeOpen' : ''"
           >{{ envelopeDesc }}</div>
         </div>
       </div>
       <div class="copyright">
         <span>武汉市玫隆皇冠食品有限公司 倾情出品</span>
-        <div class="logistics" @click="handleLogistics">
-          <img src="../assets/images/wuliu.png" alt />
+        <div class="logistics" @click="handleLogistics" v-if="!isEdit">
+          <img src="../assets/images/wuliu.png" />
           <span>查看物流</span>
         </div>
       </div>
     </div>
 
-    <div class="letter-back">
+    <div class="letter-back" :class="[isRotated ? 'letter-back-rotation': '', isRotateBack ? 'letter-back-unrotation' : '']">
       <div class="detail-header">
-        <img src="../assets/images/arrow_left.png" alt />
+        <img @click="handleBackToLetter" src="../assets/images/arrow_left.png" alt />
         <span>物流详情</span>
       </div>
       <div class="detail-product">
         <img src="../assets/images/product.png" alt />
+        <span class="count">×1</span>
       </div>
       <div class="detail-status">
         <span>订单状态</span>
       </div>
-      <timeline>
-        <timeline-item >item1</timeline-item>
-        <timeline-item :hollow="true">item2</timeline-item>
+      <timeline v-if="express.length">
+        <timeline-item class="timeline-item" v-for="(item, index) in express" :key="index" :hollow="Boolean(index)">
+          <span class="accept-time">{{ item.acceptdatetime }}</span>
+          <span class="accept-station">{{ item.acceptstation }}</span>
+        </timeline-item>
       </timeline>
+      <div class="no-logistics" v-else>
+        <img src="../assets/images/no_logistics.png" alt="">
+        <span>暂无物流信息~</span>
+      </div>
     </div>
   </div>
 </template>
@@ -178,6 +185,10 @@ export default {
       isExpand: true,
       envelopeDesc: "",
       isReadOnly: false,
+      // true 整体旋转 看到物流详情
+      isRotated: false,
+      //  true 整体旋转回来到 信封页面
+      isRotateBack: false,
       expressInfo: {
         Sender: {
           name: "",
@@ -343,7 +354,7 @@ export default {
           }
         })
         .catch(err => {
-          this.isEdit = false;
+          
           console.log(err);
         });
     },
@@ -406,8 +417,17 @@ export default {
         });
     },
 
-    //  查看物流信息
-    handleLogistics() {}
+    //  点击查看物流信息
+    handleLogistics() {
+      this.isRotated = true
+      this.isRotateBack = false
+    },
+
+    //  点击回到信封页
+    handleBackToLetter() {
+      this.isRotateBack = true
+      this.isRotated = false
+    }
   }
 };
 </script>
@@ -417,13 +437,14 @@ export default {
   width: 100vw;
   height: 100vh;
   position: relative;
+  perspective: 1200px;
+  background: #576574;
 }
 
 .letter {
   background: #004e92;
   width: 100%;
   height: 100%;
-  transform: rotateY(0deg);
   position: absolute;
   backface-visibility: hidden;
 }
@@ -870,16 +891,6 @@ input:disabled {
   margin-right: 4px;
 }
 
-.letter-wrapper:hover .letter {
-  transition: all 2s;
-  transform: rotateY(180deg);
-}
-
-.letter-wrapper:hover .letter-back {
-  transition: all 2s;
-  transform: rotateY(0);
-}
-
 .letter-back {
   position: absolute;
   width: 100%;
@@ -916,9 +927,101 @@ input:disabled {
   box-shadow: 0 0 4px rgba(189, 195, 199, 0.5);
 }
 
+.detail-product .count {
+  letter-spacing: 6px;
+  margin-left: 30px;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+
 .detail-status {
-  padding: 30px;
+  padding: 20px;
   font-size: 28px;
   color: #333;
+}
+
+/* 从信封页旋转到物流页 */
+.letter-rotation {
+  animation: letter-rotation 1s ease-in-out forwards;
+}
+
+@keyframes letter-rotation {
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+.letter-back-rotation {
+  animation: letter-back-rotation 1s ease-in-out forwards;
+}
+
+@keyframes letter-back-rotation {
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+/* 从物流页旋转到信封页 */
+.letter-unrotation {
+  animation: letter-unrotation 1s ease-in-out forwards;
+}
+
+@keyframes letter-unrotation {
+  0% {
+    transform: rotateY(180deg);
+  }
+
+  100% {
+    transform: rotateY(0);
+  }
+}
+
+.letter-back-unrotation {
+  animation: letter-back-unrotation 1s ease-in-out forwards;
+}
+
+@keyframes letter-back-unrotation {
+  0% {
+    transform: rotateY(0);
+  }
+
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+
+.timeline-item {
+  font-size: 24px;
+}
+
+.timeline-item .accept-time {
+  display: block;
+}
+
+.timeline-item .accept-station {
+  display: block;
+  padding: 10px 0;
+  line-height: 40px;
+}
+
+.no-logistics {
+  display: flex;
+  flex-direction: column;
+  color: #c5c5c5;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 70%);
+}
+
+.no-logistics img {
+  width: 150px;
+  height: 150px;
+}
+
+.no-logistics span {
+  display: block;
+  font-size: 24px;
+  padding: 40px;
 }
 </style>
