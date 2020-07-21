@@ -1,9 +1,18 @@
 <template>
   <div class="letter-wrapper">
-    <div class="letter" :class="[isRotated ? 'letter-rotation' : '', isRotateBack ? 'letter-unrotation' : '']">
+    <div
+      class="letter"
+      :class="[isRotated ? 'letter-rotation' : '', isRotateBack ? 'letter-unrotation' : '']"
+    >
       <div class="logo">
-        <img src="../assets/images/crown_logo.png" alt />
-        <img src="../assets/images/post_logo.png" alt />
+        <div class="coorperation">
+          <img src="../assets/images/crown_logo.png" alt />
+          <img src="../assets/images/post_logo.png" alt />
+        </div>
+        <div class="logistics" @click="handleLogistics" v-if="!isEdit">
+          <img src="../assets/images/wuliu.png" />
+          <span>查看物流</span>
+        </div>
       </div>
       <div class="paper-wrapper">
         <div class="paper" :class="isSubmit ? 'paperMove' : ''">
@@ -129,14 +138,13 @@
       </div>
       <div class="copyright">
         <span>武汉市玫隆皇冠食品有限公司 倾情出品</span>
-        <div class="logistics" @click="handleLogistics" v-if="!isEdit">
-          <img src="../assets/images/wuliu.png" />
-          <span>查看物流</span>
-        </div>
       </div>
     </div>
 
-    <div class="letter-back" :class="[isRotated ? 'letter-back-rotation': '', isRotateBack ? 'letter-back-unrotation' : '']">
+    <div
+      class="letter-back"
+      :class="[isRotated ? 'letter-back-rotation': '', isRotateBack ? 'letter-back-unrotation' : '']"
+    >
       <div class="detail-header">
         <img @click="handleBackToLetter" src="../assets/images/arrow_left.png" alt />
         <span>物流详情</span>
@@ -149,13 +157,18 @@
         <span>订单状态</span>
       </div>
       <timeline v-if="express.length">
-        <timeline-item class="timeline-item" v-for="(item, index) in express" :key="index" :hollow="Boolean(index)">
+        <timeline-item
+          class="timeline-item"
+          v-for="(item, index) in express"
+          :key="index"
+          :hollow="Boolean(index)"
+        >
           <span class="accept-time">{{ item.acceptdatetime }}</span>
           <span class="accept-station">{{ item.acceptstation }}</span>
         </timeline-item>
       </timeline>
       <div class="no-logistics" v-else>
-        <img src="../assets/images/no_logistics.png" alt="">
+        <img src="../assets/images/no_logistics.png" alt />
         <span>暂无物流信息~</span>
       </div>
     </div>
@@ -164,7 +177,7 @@
 
 <script>
 import VDistpicker from "v-distpicker";
-import { Timeline, TimelineItem, TimelineTitle } from 'vue-cute-timeline'
+import { Timeline, TimelineItem, TimelineTitle } from "vue-cute-timeline";
 import { request } from "@/network/request";
 
 export default {
@@ -354,7 +367,6 @@ export default {
           }
         })
         .catch(err => {
-          
           console.log(err);
         });
     },
@@ -419,14 +431,14 @@ export default {
 
     //  点击查看物流信息
     handleLogistics() {
-      this.isRotated = true
-      this.isRotateBack = false
+      this.isRotated = true;
+      this.isRotateBack = false;
     },
 
     //  点击回到信封页
     handleBackToLetter() {
-      this.isRotateBack = true
-      this.isRotated = false
+      this.isRotateBack = true;
+      this.isRotated = false;
     }
   }
 };
@@ -453,23 +465,47 @@ export default {
   width: 100%;
   height: 130px;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.logo img {
-  margin: 30px 44px;
+.logo .coorperation {
   position: absolute;
+  left: 45px;
 }
 
-.logo img:nth-child(1) {
+.logo .coorperation img {
+  margin-right: 20px;
+}
+
+.logo .coorperation img:nth-child(1) {
   width: 80px;
   height: 80px;
-  right: 105px;
 }
 
-.logo img:nth-child(2) {
+.logo .coorperation img:nth-child(2) {
   width: 84px;
   height: 80px;
-  right: 0;
+}
+
+ .logistics {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 24px;
+  position: absolute;
+  right: 45px;
+  box-shadow: 2px 2px 4px rgba(33, 33, 33, .5);
+}
+
+.logistics img {
+  width: 26px;
+  height: 26px;
+  margin-right: 10px;
 }
 
 .paper-wrapper {
@@ -875,22 +911,6 @@ input:disabled {
   letter-spacing: 3px;
 }
 
-.copyright .logistics {
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.copyright img {
-  width: 28px;
-  height: 28px;
-  margin-right: 4px;
-}
-
 .letter-back {
   position: absolute;
   width: 100%;
@@ -918,6 +938,8 @@ input:disabled {
 }
 
 .detail-product {
+  display: flex;
+  align-items: center;
   padding: 30px;
 }
 
