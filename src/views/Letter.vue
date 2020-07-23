@@ -37,7 +37,7 @@
                   </div>
 
                   <div class="phone">
-                    <span>电话：</span>
+                    <span>手机：</span>
                     <input :disabled="!isEdit" v-model="expressInfo.Receiver.phone" />
                   </div>
                 </div>
@@ -75,7 +75,7 @@
                 </div>
 
                 <div class="phone">
-                  <span>电话：</span>
+                  <span>手机：</span>
                   <input
                     :disabled="!isEdit"
                     v-bind:readonly="isReadOnly"
@@ -300,12 +300,22 @@ export default {
           receiver.town = "略";
           sender.town = "略";
 
+          let phoneReg = /^[1][3, 4, 5, 7, 8][0-9]{9}$/
+          let recPhone = receiver.phone
+          let sendPhone = sender.phone
           if (
             this.objHasAllValues(Object.values(receiver)) &&
-            this.objHasAllValues(Object.values(sender)) &&
-            receiver.phone.length == 11 &&
-            sender.phone.length == 11
+            this.objHasAllValues(Object.values(sender))
           ) {
+            if (recPhone.length !== 11 || sendPhone.length !== 11) {
+              this.$toast('手机号码应为11位...')
+              return
+            }
+
+            if (!phoneReg.test(recPhone) || !phoneReg.test(sendPhone)) {
+              this.$toast('手机号码格式不正确...')
+              return
+            }
             this.$loading.show("提交中...");
             request({
               url: "/postinfoupdate",
