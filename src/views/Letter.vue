@@ -296,9 +296,9 @@ export default {
            */
           let { Receiver: receiver, Sender: sender } = this.expressInfo;
 
-          //  请求到的town字段暂时无用 为了判断是否有值 用 略 代替
-          receiver.town = "略";
-          sender.town = "略";
+          //  请求到的town字段暂时无用 为了判断是否有值 用 - 代替
+          receiver.town = "-";
+          sender.town = "-";
 
           let phoneReg = /^[1][3, 4, 5, 7, 8][0-9]{9}$/
           let recPhone = receiver.phone
@@ -308,12 +308,12 @@ export default {
             this.objHasAllValues(Object.values(sender))
           ) {
             if (recPhone.length !== 11 || sendPhone.length !== 11) {
-              this.$toast('手机号码应为11位...')
+              this.$toast('手机号码应为11位！')
               return
             }
 
             if (!phoneReg.test(recPhone) || !phoneReg.test(sendPhone)) {
-              this.$toast('手机号码格式不正确...')
+              this.$toast('手机号码格式不正确！')
               return
             }
             this.$loading.show("提交中...");
