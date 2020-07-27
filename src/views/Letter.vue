@@ -121,7 +121,6 @@
         <div class="main">
           <img
             class="back"
-            src="../assets/images/envelope_back.png"
             :class="isSubmit ? 'envelopeMove' : ''"
           />
           <img
@@ -798,6 +797,7 @@ input:disabled {
   width: 100%;
   height: 100%;
   z-index: 10;
+  background: #fbf9f4;
 }
 
 .main .front {
