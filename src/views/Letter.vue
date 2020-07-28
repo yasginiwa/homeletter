@@ -19,14 +19,14 @@
           <div class="paper-1">
             <div class="backside" :class="isSubmit ? 'backFold': ''"></div>
             <div class="cover" :class="isSubmit ? 'coverFold' : ''">
-              <img src="../assets/images/paper_1.png" alt class="paper-1" />
+              <img src="../assets/images/paper_1.png" class="paper-1" />
               <div class="sender">
                 <div class="title">
                   <div>收</div>
                   <div>件</div>
                   <div>人</div>
                   <div class="modifyinfo" v-show="!isEdit" @click="modifyInfo">
-                    <img src="../assets/images/modify.png" alt />
+                    <img src="../assets/images/modify.png"/>
                     <i>修改</i>
                   </div>
                 </div>
@@ -56,7 +56,7 @@
             </div>
           </div>
           <div class="paper-2">
-            <img src="../assets/images/paper_2.png" alt class="paper-2" />
+            <img src="../assets/images/paper_2.png" class="paper-2" />
             <div class="poster">
               <div class="detail">
                 <span>详细地址：</span>
@@ -819,7 +819,8 @@ input:disabled {
 
 @keyframes paperMoveDown {
   0% {
-    transform: translateY(-130px) scale(0.6) translateZ(80px);
+    /* transform: translateY(-130px) scale(0.6) translateZ(80px); */
+    transform: translateY(-130px) scale(0.6);
   }
   100% {
     transform: translateY(40px) scale(0.6);
@@ -862,22 +863,23 @@ input:disabled {
 
 @keyframes envelopeMoveFront {
   100% {
-    transform: translateY(-120px) translateZ(100px);
+    /* transform: translateY(-120px) translateZ(100px); */
+    transform: translateY(-120px);
   }
 }
 
 .envelope .openBtn {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 100px;
   /* background: pink; */
   color: #fff;
-  bottom: 228px;
+  bottom: 202px;
   z-index: 999;
   font-size: 20px;
   font-weight: bold;
   text-align: center;
-  line-height: 50px;
+  line-height: 100px;
   text-shadow: 0 0 10px #000;
 }
 
@@ -887,7 +889,7 @@ input:disabled {
 
 @keyframes open {
   100% {
-    transform: translateZ(200px);
+    /* transform: translateZ(200px); */
   }
 }
 
@@ -901,7 +903,8 @@ input:disabled {
     transform: translateY(-120px);
   }
   100% {
-    transform: translateZ(220px) translateY(-120px);
+    /* transform: translateZ(220px) translateY(-120px); */
+    transform: translateY(-120px);
   }
 }
 
