@@ -252,6 +252,7 @@ export default {
         }
       })
         .then(res => {
+
           //  隐藏加载框
           this.$loading.hide();
 
