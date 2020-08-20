@@ -149,8 +149,24 @@
         <span>物流详情</span>
       </div>
       <div class="detail-product">
-        <img src="../assets/images/product.png" alt />
-        <span class="count">×1</span>
+        <img v-if="expressInfo.goods.items[0].name == '招牌蛋黄酥（6只装）邮寄版'" src="../assets/images/招牌蛋黄酥（6只装）邮寄版.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '招牌蛋黄酥（12只装）邮寄版'" src="../assets/images/招牌蛋黄酥（12只装）邮寄版.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '皓月（邮寄版）'" src="../assets/images/皓月（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '朗月（邮寄版）'" src="../assets/images/朗月（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '美好心意（邮寄版）'" src="../assets/images/美好心意（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '一封家书（邮寄版）'" src="../assets/images/一封家书（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '嘉月（邮寄版）'" src="../assets/images/嘉月（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '流芯奶黄礼盒（邮寄版）'" src="../assets/images/流芯奶黄礼盒（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '颂月（邮寄版）'" src="../assets/images/颂月（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '锦礼（邮寄版）'" src="../assets/images/锦礼（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '心系团圆（邮寄版）'" src="../assets/images/心系团圆（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '团圆礼（邮寄版）'" src="../assets/images/团圆礼（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '幸福礼（邮寄版）'" src="../assets/images/幸福礼（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '双福礼（邮寄版）'" src="../assets/images/双福礼（邮寄版）.png"/>
+        <img v-else-if="expressInfo.goods.items[0].name == '悦满臻礼（邮寄版）'" src="../assets/images/悦满臻礼（邮寄版）.png"/>
+        <img v-else src="../assets/images/logo_small.png"/>
+        <span class="productname">{{expressInfo.goods.items[0].name}}</span>
+        <span class="count">×{{expressInfo.goods.items[0].count}}</span>
       </div>
       <div class="detail-status">
         <span>订单状态</span>
@@ -217,6 +233,12 @@ export default {
           city: "",
           district: "",
           address: ""
+        },
+        goods: {
+          items: [ {
+           name: '',
+           count: '' 
+          }]
         }
       },
       express: []
@@ -955,18 +977,24 @@ input:disabled {
   display: flex;
   align-items: center;
   padding: 30px;
+  justify-content: space-around;
+}
+
+.detail-product span:nth-child(2) {
+  font-size: 24px;
 }
 
 .detail-product img {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 120px;
   box-shadow: 0 0 4px rgba(189, 195, 199, 0.5);
 }
 
 .detail-product .count {
+  font-size: 20px;
   letter-spacing: 6px;
   margin-left: 30px;
-  color: #333;
+  color: #999;
   -webkit-font-smoothing: antialiased;
 }
 
