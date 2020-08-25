@@ -322,6 +322,7 @@ export default {
           receiver.town = "-";
           sender.town = "-";
 
+          //  手机号码正则
           let phoneReg = /^[1][3, 4, 5, 7, 8][0-9]{9}$/
           let recPhone = receiver.phone
           let sendPhone = sender.phone
@@ -353,7 +354,7 @@ export default {
                   //  请求失败
                   console.log("失败");
                   this.$loading.hide();
-                  this.$toast("手机网络不给力，请点击右上角“刷新”页面！", {
+                  this.$toast("券码不正确，请重新扫描！", {
                     duration: 2000
                   });
                 } else {
