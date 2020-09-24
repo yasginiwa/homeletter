@@ -168,6 +168,13 @@
         <span class="productname">{{expressInfo.goods.items[0].name}}</span>
         <span class="count">×{{expressInfo.goods.items[0].count}}</span>
       </div>
+
+      <!-- 显示订单号 官方查询通道 -->
+      <div class="query-express">
+        <span>中国邮政  {{ expressInfo.ExpressNo }}</span>
+        <img src="../assets/images/copy.png" @click="copyExpressNo">
+        <a href="http://www.ems.com.cn/">官方查询 >></a>
+      </div>
       <div class="detail-status">
         <span>订单状态</span>
       </div>
@@ -359,6 +366,7 @@ export default {
                   });
                 } else {
                   //  请求成功
+                  console.log(result)
                   let { result } = res.data.data;
                   //请求失败 code "15210", "邮件已提交快递，不允许再更新"
                   if (result.code === 15210) {
@@ -472,6 +480,14 @@ export default {
     handleBackToLetter() {
       this.isRotateBack = true;
       this.isRotated = false;
+    },
+
+    //  复制快递单号
+    copyExpressNo() {
+      this.$copyText(this.expressInfo.ExpressNo)
+      .then(e => {
+        this.$toast('复制成功')
+      })
     }
   }
 };
@@ -1088,5 +1104,28 @@ input:disabled {
   display: block;
   font-size: 24px;
   padding: 40px;
+}
+
+.query-express {
+  display: flex;
+  font-size: 20px;
+  padding: 20px;
+  align-items: center;
+  color: #666;
+  position: relative;
+}
+
+.query-express img {
+  width: 24px;
+  height: 24px;
+  margin-left: 20px;
+}
+
+.query-express a {
+  font-size: 20px;
+  color: #666;
+  text-decoration: none;
+  position: absolute;
+  right: 70px;
 }
 </style>
