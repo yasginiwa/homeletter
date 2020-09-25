@@ -170,7 +170,7 @@
       </div>
 
       <!-- 显示订单号 官方查询通道 -->
-      <div class="query-express">
+      <div class="query-express" v-if="expressInfo.ExpressNo !== ''">
         <span>中国邮政  {{ expressInfo.ExpressNo }}</span>
         <img src="../assets/images/copy.png" @click="copyExpressNo">
         <a href="http://www.ems.com.cn/">官方查询 >></a>
